@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default async function RootLayout({
       >
         <nav className="flex flex-row justify-between border-b border-gray-700">
           <div className="p-8">
-            <h1 className="font-bold font-2xl">Migration Colombia</h1>
+            <Link href="/">
+              <h1 className="font-bold font-2xl">Migration Colombia</h1>
+            </Link>
           </div>
           <div className="flex-grow flex flex-row justify-end gap-4 p-8">
             <a

@@ -1,3 +1,5 @@
+import { transformLocationName } from "./transforms";
+
 const baseUrl = "https://agendamigracol.naturasoftware.com";
 
 async function get<ResponseData>(url: string): Promise<ResponseData> {
@@ -36,24 +38,25 @@ async function post<RequestData, ResponseData>(
   return res.json();
 }
 
-type Municipio = {
+type City = {
+  mun_slug: string;
   mun_id: string;
   mun_nombre: string;
   mun_estado: string;
   dep_id: string;
 };
 
-type Departamento = {
+type Departament = {
   dep_id: string;
   dep_nombre: string;
   dep_estado: string;
-  municipios: Municipio[];
+  municipios: City[];
 };
 
-type MunicipioResponse = Municipio & {
-  dep: Departamento;
+type CityResponse = City & {
+  dep: Departament;
 };
-type Sedes = {
+type Location = {
   se_id: string;
   se_nombre: string;
   se_direccion: string;
@@ -68,30 +71,31 @@ type Sedes = {
   mun_id: string;
 };
 
-export type SedesResponse = {
-  sedes: Sedes;
-  mun: MunicipioResponse;
+export type LocationsResponse = {
+  sedes: Location;
+  mun: CityResponse;
 };
 
-type Tramite = {
+type Service = {
   tra_id: string;
   tra_nombre: string;
   tra_estado: string;
 };
 
-type CitasDisponible = {
+type AvailableAppointment = {
   title: string;
   date: string;
 };
 
-export const getSedes = async (): Promise<SedesResponse[]> => {
+export const getLocations = async (): Promise<LocationsResponse[]> => {
   try {
-    const departamentos = await get<Departamento[]>(
+    const departamentos = await get<Departament[]>(
       "/backend/api/v1/cita/obtener_ubicacion_sedes",
     );
     const municipios = departamentos.flatMap((dep) =>
       dep.municipios.map((mun) => ({
         ...mun,
+        mun_slug: transformLocationName(mun.mun_nombre),
         dep,
       })),
     );
@@ -104,7 +108,7 @@ export const getSedes = async (): Promise<SedesResponse[]> => {
               dep_id: string;
               mun_id: string;
             },
-            Sedes[]
+            Location[]
           >("/backend/api/v1/cita/obtener_sedes", {
             dep_id: mun.dep_id,
             mun_id: mun.mun_id,
@@ -138,9 +142,9 @@ export const getSchedule = async (
   se_id: string,
 ): Promise<
   Array<
-    Tramite & {
+    Service & {
       error?: string;
-      disponibles: CitasDisponible[];
+      disponibles: AvailableAppointment[];
     }
   >
 > => {
@@ -149,7 +153,7 @@ export const getSchedule = async (
       {
         se_id: string;
       },
-      Tramite[]
+      Service[]
     >("/backend/api/v1/cita/obtener_tramites", { se_id });
 
     return await Promise.all(
@@ -160,7 +164,7 @@ export const getSchedule = async (
               se_id: string;
               tra_id: string;
             },
-            CitasDisponible[]
+            AvailableAppointment[]
           >("/backend/api/v1/cita/ver_agendas_disponibles", {
             se_id,
             tra_id: tramite.tra_id,

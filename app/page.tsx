@@ -1,11 +1,11 @@
 import { Suspense } from "react";
-import Sedes from "./Sedes";
+import Locations from "../components/Locations";
 import { LoadingSidebar } from "@/lib/loading";
 
 export default async function Home() {
   return (
     <Suspense fallback={<LoadingSidebar />}>
-      <Sedes />
+      <Locations />
     </Suspense>
   );
 }
