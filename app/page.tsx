@@ -7,5 +7,5 @@ export default async function Home() {
     <Suspense fallback={<LoadingSidebar />}>
       <Sedes />
     </Suspense>
-  )
+  );
 }
